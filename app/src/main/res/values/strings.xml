@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Touch Me Not !!</string>
+    <string name="start_monitoring_txt">Start Monitoring</string>
+    <string name="stop_monitoring_txt">Stop Monitoring</string>
+    <string name="monitoring_social_distance">Monitoring your social distance......</string>
+    <string name="notification_title">CheckForDistance</string>
+    <string name="activity_main_title">Touch Me Not !!</string>
+</resources>

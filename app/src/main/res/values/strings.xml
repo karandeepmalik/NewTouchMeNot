@@ -1,8 +1,20 @@
 <resources>
-    <string name="app_name">Touch Me Not !!</string>
+    <string name="app_name">Touch Me Not Ultrasound!!</string>
     <string name="start_monitoring_txt">Start Monitoring</string>
     <string name="stop_monitoring_txt">Stop Monitoring</string>
     <string name="monitoring_social_distance">Monitoring your social distance......</string>
     <string name="notification_title">CheckForDistance</string>
     <string name="activity_main_title">Touch Me Not !!</string>
+    <string name="social_time_limit_label">Set the social time limit(minutes)</string>
+    <string name="social_distancing_limit_label">Set the social distancing limit(mts)</string>
+    <string name="disclaimer_label">* Due to health concerns this app tracks your location history while in operation.</string>
+    <string name="send_logs">Send Logs</string>
+    <string name="device_exclusions">Filter Devices</string>
+    <string name="scan_devices">Scan Devices</string>
+    <string name="remove_devices">Delete All Excluded Devices</string>
+    <string name="list_paired_devices">List Of Paired Devices</string>
+    <string name="list_of_devices">List Of Devices</string>
+    <string name="list_of_filtered_devices">List of Filtered Devices</string>
+    <string name="send_history">Send History</string>
+
 </resources>

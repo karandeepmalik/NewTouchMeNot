@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "91207033313",
+    "firebase_url": "https://touch-me-not-abf45.firebaseio.com",
+    "project_id": "touch-me-not-abf45",
+    "storage_bucket": "touch-me-not-abf45.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:91207033313:android:96d6c41b915afe3da4f2a0",
+        "android_client_info": {
+          "package_name": "com.hackforsweden.touchmenot"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "91207033313-830cbsntq0d8l03sbnkn8vmbqrr38s8k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD5q7__1YC9UBRZIvDFFpkUfgaBiTU9h7c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "91207033313-830cbsntq0d8l03sbnkn8vmbqrr38s8k.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

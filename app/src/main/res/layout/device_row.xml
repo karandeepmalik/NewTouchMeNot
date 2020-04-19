@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_margin="5dp"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:layout_margin="15dp"
+        android:id="@+id/tvDeviceName"
+        android:text="Device Name"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_below="@+id/tvDeviceName"
+        android:textColor="#8BC34A"
+        android:textStyle="bold"
+        android:visibility="gone"
+        android:id="@+id/tvAdded"
+        android:layout_marginLeft="15dp"
+        android:layout_height="wrap_content"
+        android:text="Added"
+        />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="35dp"
+        android:layout_alignParentRight="true"
+        android:id="@+id/Add"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="15dp"
+        android:background="#4CAF50"
+        android:layout_marginBottom="10dp"
+        android:textColor="#fff"
+        android:text="Add"
+        />
+
+    <Button
+        android:layout_width="wrap_content"
+         android:background="#F44336"
+        android:layout_marginBottom="10dp"
+        android:layout_alignParentRight="true"
+        android:visibility="gone"
+        android:id="@+id/remove"
+        android:textColor="#000"
+        android:layout_marginTop="15dp"
+        android:layout_marginRight="10dp"
+        android:layout_height="35dp"
+        android:text="Remove"
+        />
+
+</RelativeLayout>

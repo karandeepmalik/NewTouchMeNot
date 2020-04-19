@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:weightSum="2"
+    android:layout_height="match_parent"
+    tools:context=".BluetoothScannedDevices">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:layout_height="0dp">
+        <TextView
+            android:id="@+id/tv_devices"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+             android:gravity="center_horizontal"
+            android:text="@string/list_of_devices"
+            android:layout_marginBottom="10dp"
+            android:textColor="#000"
+            android:textStyle="bold"
+            android:layout_marginTop="10dp"
+            android:textAlignment="center"
+             />
+
+        <ListView
+            android:id="@+id/lv_scan_devices"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+           />
+
+
+    </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_height="0dp">
+
+            <TextView
+                android:id="@+id/filtered_devices"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:layout_marginTop="10dp"
+                android:textColor="#000"
+                android:textStyle="bold"
+                android:layout_marginBottom="10dp"
+                android:text="@string/list_of_filtered_devices"
+                android:textAlignment="center"
+            />
+
+            <ListView
+                android:id="@+id/lv_filtered_devices"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                  />
+        </LinearLayout>
+
+
+
+
+
+</LinearLayout>

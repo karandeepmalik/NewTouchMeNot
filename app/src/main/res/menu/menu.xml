@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- "Mark Favorite", should appear as action button if possible -->
+    <item
+        android:id="@+id/action_send_logs"
+        android:title="@string/send_logs"
+        app:showAsAction="never"/>
+
+    <item android:id="@+id/action_send_history"
+        android:title="@string/send_history"
+        app:showAsAction="never"/>
+
+    <item android:id="@+id/action_device_exclusions"
+        android:title="@string/device_exclusions"
+        app:showAsAction="never"/>
+
+
+</menu>

@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginTop="464dp"
+        android:layout_marginTop="396dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:background="@color/colorPrimary"
@@ -45,19 +45,19 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/btnStartService"
         app:layout_constraintTop_toBottomOf="@+id/btnStartService"
-        app:layout_constraintVertical_bias="0.239" />
+        app:layout_constraintVertical_bias="0.073" />
 
     <TextView
         android:id="@+id/tv_distance_monitoring"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Set the social distancing limit(mts)"
+        android:text="@string/social_distancing_limit_label"
         app:layout_constraintBottom_toTopOf="@+id/btnStartService"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.084"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.589" />
+        app:layout_constraintVertical_bias="0.535" />
 
     <androidx.appcompat.widget.AppCompatSpinner
         android:id="@+id/sp_distance_monitoring"
@@ -68,22 +68,22 @@
         android:textSize="18sp"
         app:layout_constraintBottom_toTopOf="@+id/btnStartService"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.432"
+        app:layout_constraintHorizontal_bias="0.514"
         app:layout_constraintStart_toEndOf="@+id/btnStartService"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.621" />
+        app:layout_constraintVertical_bias="0.54" />
 
     <TextView
         android:id="@+id/tv_time_monitoring"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Set the social time limit(minutes)"
+        android:text="@string/social_time_limit_label"
         app:layout_constraintBottom_toTopOf="@+id/btnStartService"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.082"
+        app:layout_constraintHorizontal_bias="0.079"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.472" />
+        app:layout_constraintVertical_bias="0.388" />
 
     <androidx.appcompat.widget.AppCompatSpinner
         android:id="@+id/sp_time_monitoring"
@@ -94,9 +94,24 @@
         android:textSize="18sp"
         app:layout_constraintBottom_toTopOf="@+id/btnStartService"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.432"
+        app:layout_constraintHorizontal_bias="0.514"
         app:layout_constraintStart_toEndOf="@+id/btnStartService"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.475" />
+        app:layout_constraintVertical_bias="0.386" />
+
+    <TextView
+        android:id="@+id/tv_disclaimer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginBottom="16dp"
+        android:gravity="center_horizontal"
+        android:text="@string/disclaimer_label"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnStopService"
+        app:layout_constraintVertical_bias="0.376" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

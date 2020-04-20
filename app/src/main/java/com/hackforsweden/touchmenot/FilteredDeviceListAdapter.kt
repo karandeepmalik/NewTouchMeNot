@@ -37,7 +37,7 @@ class FilteredDeviceListAdapter(
         }
 
         rowView.findViewById<Button>(R.id.remove).setOnClickListener{
-            DbHelper.getInstance(context).deleteDeviceId(dataItem.address)
+            DbHelper.instance.deleteDeviceId(dataItem.address)
             dataList.removeAt(position)
             filteredDeviceIdSet!!.remove(dataItem.address)
             BluetoothScannedDevices.scannedDeviceListAdapter?.updateScannedAdapter()

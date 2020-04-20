@@ -46,7 +46,7 @@ class ScannedDeviceListAdapter (var filteredDeviceIdSet:MutableSet<String?>?,pri
 
             if (!filteredDeviceIdSet!!.contains(dataitem.address)) {
 
-            DbHelper.getInstance(context).addDeviceId(dataitem.address,dataitem.deviceName)
+            DbHelper.instance.addDeviceId(dataitem.address,dataitem.deviceName)
             rowView.findViewById<TextView>(R.id.tvAdded) .visibility = View.VISIBLE
 
             filteredDeviceIdSet?.add(dataitem.address)
@@ -58,7 +58,7 @@ class ScannedDeviceListAdapter (var filteredDeviceIdSet:MutableSet<String?>?,pri
 
         rowView.findViewById<Button>(R.id.remove).setOnClickListener{
 
-            DbHelper.getInstance(context).deleteDeviceId(dataitem.address)
+            DbHelper.instance.deleteDeviceId(dataitem.address)
 
             dataList.removeAt(position)
             this.notifyDataSetChanged()

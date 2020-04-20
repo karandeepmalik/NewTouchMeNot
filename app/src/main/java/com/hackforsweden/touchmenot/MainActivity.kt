@@ -194,7 +194,7 @@ class MainActivity : AppCompatActivity() {
 
             doAsync {
                 // do your background thread task
-                DbHelper.getInstance(applicationContext).getLogFile(gpxfile)
+                DbHelper.instance.getLogFile(gpxfile)
 
                 uiThread {
                     // use result here if you want to update ui
@@ -225,7 +225,7 @@ class MainActivity : AppCompatActivity() {
 
             doAsync {
                 // do your background thread task
-                DbHelper.getInstance(applicationContext).getHistoryFile(historyFile)
+                DbHelper.instance.getHistoryFile(historyFile)
 
                 uiThread {
                     // use result here if you want to update ui

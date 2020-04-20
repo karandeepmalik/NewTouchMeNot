@@ -10,9 +10,8 @@ import java.io.FileWriter
 import java.text.SimpleDateFormat
 import java.util.*
 
-class DbHelper(context: Context,
-               factory: SQLiteDatabase.CursorFactory?) :
-    SQLiteOpenHelper(context, DATABASE_NAME,
+class DbHelper(factory: SQLiteDatabase.CursorFactory?) :
+    SQLiteOpenHelper(MyApplication.appContext, DATABASE_NAME,
         factory, DATABASE_VERSION) {
 
     override fun onCreate(db: SQLiteDatabase) {
@@ -62,7 +61,6 @@ class DbHelper(context: Context,
 
         val db = this.writableDatabase
         db.insert(LOG_TABLE_NAME, null, values)
-        db.close()
     }
 
     fun addHistory(macAddress: String) {
@@ -74,7 +72,7 @@ class DbHelper(context: Context,
         values.put(HISTORY_COLUMN_MONTH,currentMonth)
         val db = this.writableDatabase
         db.insert(HISTORY_TABLE_NAME, null, values)
-        db.close()
+
     }
 
     fun addDeviceId(deviceId: String?,deviceName:String?) {
@@ -86,7 +84,7 @@ class DbHelper(context: Context,
 
         val db = this.writableDatabase
         db.insert(DEVICES_TABLE_NAME, null, values)
-        db.close()
+
     }
 
     fun getAllDevices(listitem:ArrayList<DeviceListItem>?,deviceIdSet:MutableSet<String?>?) {
@@ -220,7 +218,17 @@ class DbHelper(context: Context,
         }
     }
 
+
+
+    private object Holder { val INSTANCE = DbHelper(null) }
+
+
+
+
     companion object {
+
+        val instance: DbHelper by lazy { Holder.INSTANCE }
+
         private const val DATABASE_VERSION = 1
         private const val DATABASE_NAME = "socialdistancelogs.db"
         const val LOG_TABLE_NAME = "logtable"
@@ -236,17 +244,6 @@ class DbHelper(context: Context,
         const val DEVICE_COLUMN_ID = "deviceid"
         const val DEVICE_COLUMN_NAME = "devicename"
 
-
-        private var instance: DbHelper? = null
-        fun getInstance(context: Context): DbHelper
-        {
-            if(instance == null)
-            {
-                instance = DbHelper(context,null)
-            }
-
-            return instance!!
-        }
     }
 
 }

@@ -83,7 +83,7 @@ class BluetoothScannedDevices : AppCompatActivity() {
 
         filteredDevices?.clear()
         filteredDevicesSet?.clear()
-        DbHelper.getInstance(this).deleteAllDeviceId()
+        DbHelper.instance.deleteAllDeviceId()
         filteredDevicesListAdapter?.notifyDataSetChanged()
         scannedDeviceListAdapter?.notifyDataSetChanged()
 
@@ -93,7 +93,7 @@ class BluetoothScannedDevices : AppCompatActivity() {
         filteredDevices?.clear()
          filteredDevicesSet = mutableSetOf<String?>();
 
-         DbHelper.getInstance(this).getAllDevices(filteredDevices,filteredDevicesSet)
+         DbHelper.instance.getAllDevices(filteredDevices,filteredDevicesSet)
         filteredDevicesListAdapter = FilteredDeviceListAdapter(filteredDevicesSet,
             this,
             filteredDevices!!

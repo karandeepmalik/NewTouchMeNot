@@ -32,16 +32,18 @@ class CheckForDistanceService : Service() {
     private var isServiceStarted = false
     private var bluetoothAdapter: BluetoothAdapter? = null
     private val notificationChannelId = "TouchMeNot"
-    private var countMap =  mutableMapOf<String,Int>()
-    private var lastDetectedMap =  mutableMapOf<String,Long>()
+    private var deviceAndSocialDistanceViolationCount =  mutableMapOf<String,Int>()
+    private var lastDetectedDeviceAndTimestamp =  mutableMapOf<String,Long>()
+    private val kalmanFilter = KalmanFilter()
 
-    private var  firstOffset=7
-    private var secondOffset:Int =0
-    private var thirdOffset:Int =0
-    private var uniqueId:String? =null
-    private var beyondThreeMeters = true
+    private var  firstOffsetOfBroadcastedSignal=7
+    private var secondOffsetOfBroadcastedSignal:Int =0
+    private var thirdOffsetOfBroadcastedSignal:Int =0
+    private var broadcastedSignal:String? =null
+    private var isDetectedDeviceBeyondThreeMeters = true
 
-    private var apiKey = "EH0GHbslb0pNWAxPf57qA6n23w4Zgu5U"
+
+    private var apiKeyOfUltraSoundLib = "EH0GHbslb0pNWAxPf57qA6n23w4Zgu5U"
 
     override fun onBind(intent: Intent): IBinder? {
         // We don't provide binding, so return null
@@ -108,7 +110,7 @@ class CheckForDistanceService : Service() {
             launch(Dispatchers.IO)
             {
                 while (isServiceStarted) {
-                    beyondThreeMeters = true
+                    isDetectedDeviceBeyondThreeMeters = true
                     detectBluetoothDevices()
                     delay(15000)
                 }
@@ -158,7 +160,7 @@ class CheckForDistanceService : Service() {
         {
             val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-            val uri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE
+            val customSoundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE
                     + "://" + packageName + "/raw/alarm")
             // Creating an Audio Attribute
             val audioAttributes = AudioAttributes.Builder()
@@ -175,7 +177,7 @@ class CheckForDistanceService : Service() {
                 it.enableVibration(true)
                 it.vibrationPattern = longArrayOf(100, 200, 300, 400, 500, 400, 300, 200, 400)
                 it.importance= IMPORTANCE_HIGH
-                it.setSound(uri, audioAttributes)
+                it.setSound(customSoundUri, audioAttributes)
                 it
             }
 
@@ -212,7 +214,7 @@ class CheckForDistanceService : Service() {
          * d = 10 ^ ((TxPower - RSSI) / (10 * n))
          */
 
-        return 10.0.pow((txPower - rssi) / (10 * 2))
+        return kalmanFilter.filter(10.0.pow((txPower - rssi) / (10 * 2)),0.0)
     }
 
     private fun detectBluetoothDevices()
@@ -230,11 +232,11 @@ class CheckForDistanceService : Service() {
             // Register for broadcasts when a device is discovered.
             var filter = IntentFilter(BluetoothDevice.ACTION_FOUND)
             // Register for broadcasts when discovery has finished
-            this.registerReceiver(btReciever, filter)
+            this.registerReceiver(btDeviceDiscoveryStatusReciever, filter)
             filter = IntentFilter(
                 BluetoothAdapter.ACTION_DISCOVERY_FINISHED
             )
-            this.registerReceiver(btReciever, filter)
+            this.registerReceiver(btDeviceDiscoveryStatusReciever, filter)
 
             if (bluetoothAdapter!!.isDiscovering) {
                 log("Stop Discovery of devices if already discovering", this)
@@ -250,7 +252,7 @@ class CheckForDistanceService : Service() {
 
     }
     // Create a BroadcastReceiver for ACTION_FOUND.
-    private val btReciever: BroadcastReceiver = object : BroadcastReceiver()
+    private val btDeviceDiscoveryStatusReciever: BroadcastReceiver = object : BroadcastReceiver()
     {
 
         override fun onReceive(context: Context, intent: Intent) {
@@ -260,80 +262,78 @@ class CheckForDistanceService : Service() {
             if (BluetoothDevice.ACTION_FOUND == action)
             {
                 log("DEVICELIST Bluetooth device found\n", context)
-                val device =
+                val detectedDevice =
                     intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
                 GlobalScope.launch(Dispatchers.IO)
                 {
                    // Do not take any action if this is a device from filtered list
-                   if(!DbHelper.instance.checkDeviceIdExist(device!!.address)) {
-                       log("Filtered Device Encountered :- " + device.address, context)
-
+                   if(!DbHelper.instance.checkDeviceIdExist(detectedDevice!!.address)) {
+                       log("Filtered Device Encountered :- " + detectedDevice.address, context)
 
                        // Create a new device item
-                       val rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE)
-                       val name = intent.getStringExtra(BluetoothDevice.EXTRA_NAME)
-                       if (device != null) {
-                           if (lastDetectedMap.containsKey(device.address)) {
-                               val timeDiff =
-                                   lastDetectedMap[device.address]!! - System.currentTimeMillis()
-                               if (timeDiff > 15000) {
+                       val detectedDeviceRSSI = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE)
+                       val detectedDeviceName = intent.getStringExtra(BluetoothDevice.EXTRA_NAME)
+                       if (detectedDevice != null) {
+                           if (lastDetectedDeviceAndTimestamp.containsKey(detectedDevice.address)) {
+                               val timeSinceLastDetection =
+                                   lastDetectedDeviceAndTimestamp[detectedDevice.address]!! - System.currentTimeMillis()
+                               if (timeSinceLastDetection > 15000) {
                                    // Since the last time this device was detected is greater than 15 secs
                                    // Stop tracking the count
-                                   val address = device.address
                                    log(
-                                       "Stop tracking count of $address since it was lastly discovered > 15 secs before",
+                                       "Stop tracking count of "+detectedDevice.address+" since it was lastly discovered > 15 secs before",
                                        context
                                    )
-                                   if (countMap.containsKey(device.address))
-                                       countMap.remove(device.address)
+                                   if (deviceAndSocialDistanceViolationCount.containsKey(detectedDevice.address))
+                                       deviceAndSocialDistanceViolationCount.remove(detectedDevice.address)
                                }
                            }
 
-                           lastDetectedMap[device.address] = System.currentTimeMillis()
+                           lastDetectedDeviceAndTimestamp[detectedDevice.address] = System.currentTimeMillis()
 
                        }
-                       val txPower = 4.0
-                       var distance = calculateDistance(rssi.toDouble(), txPower)
-                       if (name != null)
-                           log("Detected Device $name", context)
-                       log("Rssi $rssi", context)
-                       log("Distance Measured $distance", context)
-                       distance /= 2500
+                       val approxTxPowerOfDetectedDevice = 4.0
+                       var distanceFromCurrentDevice = calculateDistance(detectedDeviceRSSI.toDouble(), approxTxPowerOfDetectedDevice)
+                       if (detectedDeviceName != null)
+                           log("Detected Device $detectedDeviceName", context)
+                       log("Rssi $detectedDeviceRSSI", context)
+                       log("Distance Measured $distanceFromCurrentDevice", context)
+                       distanceFromCurrentDevice /= 2500
 
-                       if (device != null) {
-                           if (distance < MainActivity.socialDistanceThreshold) {
+                       if (detectedDevice != null) {
+                           if (distanceFromCurrentDevice < MainActivity.socialDistanceThreshold) {
 
-                               if (countMap.containsKey(device.address)) {
-                                   var count = countMap[device.address]!!
+                               if (deviceAndSocialDistanceViolationCount.containsKey(detectedDevice.address)) {
+                                   var count = deviceAndSocialDistanceViolationCount[detectedDevice.address]!!
                                    count += 1
-                                   val address = device.address
+                                   val address = detectedDevice.address
                                    log(
                                        "Increment the  count of $address  by 1. The new count is $count",
                                        context
                                    )
-                                   countMap[device.address] = count
-                                   log("Device: " + device.address + " Count: $count", context)
+                                   deviceAndSocialDistanceViolationCount[detectedDevice.address] = count
+                                   log("Device: " + detectedDevice.address + " Count: $count", context)
                                } else {
-                                   countMap[device.address] = 1
+                                   deviceAndSocialDistanceViolationCount[detectedDevice.address] = 1
                                    log(
-                                       "Newly discovered Device: " + device.address + "Count: 1",
+                                       "Newly discovered Device: " + detectedDevice.address + "Count: 1",
                                        context
                                    )
                                }
 
                            } else {
                                log(
-                                   "This device " + device.address + " is obeying social distancing so  dont track its count",
+                                   "This device " + detectedDevice.address + " is obeying social distancing so  dont track its count",
                                    context
                                )
-                               if (countMap.containsKey(device.address)) {
-                                   countMap.remove(device.address)
+                               if (deviceAndSocialDistanceViolationCount.containsKey(detectedDevice.address)) {
+                                   deviceAndSocialDistanceViolationCount.remove(detectedDevice.address)
                                }
                            }
                        }
 
-                       for (detectedDevice in countMap) {
-                           if ((detectedDevice.value >= MainActivity.socialTimeThreshold * 4) && !beyondThreeMeters) {
+                       for (detectedDevice in deviceAndSocialDistanceViolationCount) {
+                           if ((detectedDevice.value >= MainActivity.socialTimeThreshold * 4) && !isDetectedDeviceBeyondThreeMeters) {
 
                                log(
                                    "This device " + detectedDevice.key + " has breached social distance for social distancing time " + MainActivity.socialTimeThreshold + " minutes. Issuing notification",
@@ -342,11 +342,11 @@ class CheckForDistanceService : Service() {
                                DbHelper.instance.addHistory(detectedDevice.key)
                                runOnUiThread()
                                {
-                                   val uri = Uri.parse(
+                                   val customSoundUri = Uri.parse(
                                        ContentResolver.SCHEME_ANDROID_RESOURCE
                                                + "://" + packageName + "/raw/alarm"
                                    )
-                                   val builder = NotificationCompat.Builder(
+                                   val notificationCompatBuilder = NotificationCompat.Builder(
                                        this@CheckForDistanceService,
                                        notificationChannelId
                                    )
@@ -355,7 +355,7 @@ class CheckForDistanceService : Service() {
                                        .setContentTitle("Alert")
                                        .setContentText("Please maintain enough social distance")
                                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                                       .setSound(uri)
+                                       .setSound(customSoundUri)
                                        // Set the intent that will fire when the user taps the notification
                                        .setAutoCancel(true)
                                        .setVibrate(longArrayOf(1000, 1000, 1000, 1000, 1000))
@@ -365,7 +365,7 @@ class CheckForDistanceService : Service() {
 
                                    with(NotificationManagerCompat.from(this@CheckForDistanceService)) {
                                        // notificationId is a unique int for each notification that you must define
-                                       notify(12345, builder.build())
+                                       notify(12345, notificationCompatBuilder.build())
                                    }
 
                                    if (bluetoothAdapter!!.isDiscovering) {
@@ -401,17 +401,17 @@ class CheckForDistanceService : Service() {
         val rand = Random();
 
 
-        secondOffset = rand.nextInt(100)
-        thirdOffset = rand.nextInt(462)
-        uniqueId = "$firstOffset.$secondOffset.$thirdOffset"
-        log("Generated unique id for Ultrasound transmission $uniqueId", this)
+        secondOffsetOfBroadcastedSignal = rand.nextInt(100)
+        thirdOffsetOfBroadcastedSignal = rand.nextInt(462)
+        broadcastedSignal = "$firstOffsetOfBroadcastedSignal.$secondOffsetOfBroadcastedSignal.$thirdOffsetOfBroadcastedSignal"
+        log("Generated unique id for Ultrasound transmission $broadcastedSignal", this)
         audioEngineSetup();
     }
 
     private fun audioEngineSetup(){
 
 
-        CUEEngine.getInstance().setupWithAPIKey(this, apiKey)
+        CUEEngine.getInstance().setupWithAPIKey(this, apiKeyOfUltraSoundLib)
         CUEEngine.getInstance().setDefaultGeneration(2)
         CUEEngine.getInstance().setReceiverCallback( OutputListener())
         enableListening(true)
@@ -423,8 +423,8 @@ class CheckForDistanceService : Service() {
 
     private fun triggerTransmission()
     {
-        log("Triggering Transmission uniqueId : $uniqueId ", this)
-        queueInput(uniqueId!!, MODE_TRIGGER, false);
+        log("Triggering Transmission uniqueId : $broadcastedSignal ", this)
+        queueInput(broadcastedSignal!!, MODE_TRIGGER, false);
     }
 
     private fun  queueInput( input :String, mode:Int, triggerAsNumber:Boolean)
@@ -470,26 +470,24 @@ class CheckForDistanceService : Service() {
     inner class OutputListener : CUEReceiverCallbackInterface
     {
         override fun run(json :String) {
-            val model:CUETrigger = parse(json)
-
-
-            onTriggerHeard(model)
-
+            val receivedSignal:CUETrigger = parse(json)
+            onTriggerHeard(receivedSignal)
         }
     }
 
-    fun onTriggerHeard(model :CUETrigger)
+    fun onTriggerHeard(receivedSignal :CUETrigger)
     {
-        if(uniqueId!![0]=='7')
+        if(broadcastedSignal!![0]=='7')
         {
-            if (uniqueId.equals(model.rawIndices))
+            if (broadcastedSignal.equals(receivedSignal.rawIndices))
             {
                 log("We heard  the same sound we sent to the other device. Ignoring it.", this@CheckForDistanceService)
 
             }
             else
             {
-                beyondThreeMeters = false;
+                // Since we could hear the UltrasoundSignal of a different device, that device  is less than 3 metres away
+                isDetectedDeviceBeyondThreeMeters = false;
                 log("We heard a the sound sent from the other device. Distance from device is less than 3 meters", this@CheckForDistanceService)
 
             }

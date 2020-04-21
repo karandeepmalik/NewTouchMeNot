@@ -80,6 +80,9 @@ class MainActivity : AppCompatActivity() {
                     .findViewById<View>(android.R.id.message) as TextView).movementMethod =
                     LinkMovementMethod.getInstance()       // Make the link clickable. Needs to be called after show(), in order to generate hyperlinks
                 PackageManager.PERMISSION_GRANTED -> {
+
+
+
                 }
             }
 
@@ -99,15 +102,8 @@ class MainActivity : AppCompatActivity() {
                 }
 
             }
-        if (ContextCompat.checkSelfPermission(
-                baseContext,
-                Manifest.permission.RECORD_AUDIO
-            ) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(
-                this@MainActivity,
-                arrayOf(Manifest.permission.RECORD_AUDIO),
-                12)
-        }
+
+        checkAudioPermission()
 
 
         val spinnerDistance =
@@ -168,9 +164,47 @@ class MainActivity : AppCompatActivity() {
             override fun onNothingSelected(parentView: AdapterView<*>?) {}
         }
 
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+
+        if(requestCode== 1){
+            var permCondition =
+                grantResults.size == 1 &&
+                grantResults[0] == PackageManager.PERMISSION_GRANTED;
+
+            if(permCondition){
+                checkAudioPermission()
+            }
+
+        }else  if(requestCode== 13){
+            var permCondition =
+                grantResults.size == 1 &&
+                        grantResults[0] == PackageManager.PERMISSION_GRANTED;
+
+            if(permCondition){
+                // permission granted successfully
+                }
+
+        }
+    }
 
 
 
+    fun checkAudioPermission(){
+        if (ContextCompat.checkSelfPermission(
+                baseContext,
+                Manifest.permission.RECORD_AUDIO
+            ) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                this@MainActivity,
+                arrayOf(Manifest.permission.RECORD_AUDIO),
+                12)
+        }
     }
     private fun actionOnService(action: Actions) {
         Intent(this, CheckForDistanceService::class.java).also {

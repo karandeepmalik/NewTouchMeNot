@@ -141,7 +141,7 @@ class DbHelper(factory: SQLiteDatabase.CursorFactory?) :
         }
     }
 
-    fun checkDeviceIdExist(deviceId: String):Boolean {
+    fun deviceIdExistsInFilteredDeviceList(deviceId: String):Boolean {
         val db = this.readableDatabase
         val cursor =db.rawQuery("SELECT EXISTS(SELECT 1 FROM $DEVICES_TABLE_NAME WHERE $DEVICE_COLUMN_ID = '$deviceId' LIMIT 1)", null)
          cursor.moveToFirst()

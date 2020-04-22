@@ -33,7 +33,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".BluetoothScannedDevices"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait"
+            />
         <service
             android:name=".CheckForDistanceService"
             android:enabled="true"

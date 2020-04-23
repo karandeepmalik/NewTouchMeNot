@@ -261,6 +261,25 @@ class CheckForDistanceService : Service() {
             BluetoothAdapter.ACTION_DISCOVERY_FINISHED
         )
         this.registerReceiver(btDeviceDiscoveryStatusReciever, filter)
+        // Register for broadcasts when a device is discovered.
+        val discFilter = IntentFilter(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED)
+        // Register for broadcasts when discovery has finished
+        this.registerReceiver(discReciever, discFilter)
+
+    }
+    // Create a BroadcastReceiver to check if device is discoverable
+    private val discReciever: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+
+            val action = intent.getIntExtra("BluetoothAdapter.EXTRA_SCAN_MODE", 1)
+            if (BluetoothAdapter.SCAN_MODE_NONE == action || BluetoothAdapter.SCAN_MODE_CONNECTABLE == action) {
+                val discoverableIntent: Intent =
+                    Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE).apply {
+                        putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 3600)
+                    }
+                startActivity(discoverableIntent)
+            }
+        }
 
     }
 

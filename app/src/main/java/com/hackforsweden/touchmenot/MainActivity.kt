@@ -191,6 +191,19 @@ class MainActivity : AppCompatActivity() {
                 }
 
         }
+        else if (requestCode ==12)
+        {
+            val permCondition =
+                grantResults.size == 1 &&
+                        grantResults[0] == PackageManager.PERMISSION_GRANTED;
+            if(permCondition)
+            {
+                val discoverableIntent: Intent = Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE).apply {
+                    putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 3600) }
+
+                startActivity(discoverableIntent)
+            }
+        }
     }
 
 
